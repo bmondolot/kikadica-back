@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/quotes');
 require('./models/Quote');
+require('./models/Kway');
 
 var routes = require('./routes/index');
 
