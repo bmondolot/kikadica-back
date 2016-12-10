@@ -30,12 +30,14 @@ router.put('/quote', function (req, res, next) {
 /* Delete a quote */
 router.delete('/quote', function (req, res, next) {
 	var quote = new Quote(req.body);
+	quote.deletionDate = new Date();	
 	
-	quote.remove(function(err, pos) {
+	Quote.findByIdAndUpdate(quote._id, quote.toObject(), {"new": true}, function(err, newQuote) {
 		if (err) {
+			console.log("Unable to delete the quote " + quote._id + " because of " + err);
 			return next(err);
 		}
-		res.json(quote);
+		res.json(newQuote);
 	});
 });
 
