@@ -27,6 +27,18 @@ router.put('/quote', function (req, res, next) {
 	});
 });
 
+/* Delete a quote */
+router.delete('/quote', function (req, res, next) {
+	var quote = new Quote(req.body);
+	
+	quote.remove(function(err, pos) {
+		if (err) {
+			return next(err);
+		}
+		res.json(quote);
+	});
+});
+
 /* Update a quote */
 router.post('/quote', function (req, res, next) {
 	var quote = new Quote(req.body);
