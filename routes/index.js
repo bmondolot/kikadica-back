@@ -9,6 +9,7 @@ var Kway = mongoose.model('Kway');
 router.get('/quotes', function(req, res, next) {
 	Quote.find({deletionDate: {$exists: false}}).sort('-creationDate').exec(function(err, quotes) {
 		if (err) {
+			console.log("Unable to get quotes because of " + err);
 			return next(err);
 		}
 		res.json(quotes);
@@ -21,6 +22,7 @@ router.put('/quote', function (req, res, next) {
 	
 	quote.save(function(err, pos) {
 		if (err) {
+			console.log("Unable to add quote " + quote + " because of " + err);
 			return next(err);
 		}
 		res.json(quote);
@@ -60,6 +62,7 @@ router.get('/quotes/byquoteduser/:quoteduser', function(req, res) {
 
 	query.exec(function(err, quotes) {
 		if (err) {
+			console.log("Unable to get quotes by quotedUser " + req.params.quoteduser + " because of " + err);
 			return next(err);
 		}
 		res.json(quotes);
@@ -72,6 +75,7 @@ router.get('/quotes/byauthoruser/:authoruser', function(req, res, next) {
 
 	query.exec(function(err, quotes) {
 		if (err) {
+			console.log("Unable to get quotes by authorUser " + req.params.authoruser + " because of " + err);
 			return next(err);
 		}
 		res.json(quotes);
