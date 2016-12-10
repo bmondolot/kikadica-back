@@ -32,7 +32,7 @@ router.delete('/quote', function (req, res, next) {
 	var quote = new Quote(req.body);
 	quote.deletionDate = new Date();	
 	
-	Quote.findByIdAndUpdate(quote._id, quote.toObject(), {"new": true}, function(err, newQuote) {
+	Quote.findByIdAndUpdate(quote._id, quote.toObject(), {'new': true}, function(err, newQuote) {
 		if (err) {
 			console.log("Unable to delete the quote " + quote._id + " because of " + err);
 			return next(err);
@@ -45,7 +45,7 @@ router.delete('/quote', function (req, res, next) {
 router.post('/quote', function (req, res, next) {
 	var quote = new Quote(req.body);
 	
-	Quote.findByIdAndUpdate(quote._id, quote.toObject(), {"new": true}, function(err, newQuote) {
+	Quote.findByIdAndUpdate(quote._id, quote.toObject(), {'new': true}, function(err, newQuote) {
 		if (err) {
 			console.log("Unable to update the quote " + quote._id + " because of " + err);
 			return next(err);
@@ -55,43 +55,27 @@ router.post('/quote', function (req, res, next) {
 });
 
 /* Find by quoted user */
-router.param('quoteduser', function(req, res, next, username) {
-	var query = Quote.find({ "quotedUser": username	});
-
-	query.exec(function (err, quotes){
-		if (err) { 
-			return next(err); 
-		}
-		if (!quotes) { 
-			return next(new Error("can't find Quote")); 
-		}
-		
-		req.quotes = quotes;
-		return next();
-	  });
-});
 router.get('/quotes/byquoteduser/:quoteduser', function(req, res) {
-	res.json(req.recette);
+	var query = Quote.find({ 'quotedUser': req.params.quoteduser, 'deletionDate': {$exists: false} }).sort('-creationDate');
+
+	query.exec(function(err, quotes) {
+		if (err) {
+			return next(err);
+		}
+		res.json(quotes);
+	});
 });
 
 /* Find by author user */
-router.param('authoruser', function(req, res, next, username) {
-	var query = Quote.find({ "authoruser": username	});
+router.get('/quotes/byauthoruser/:authoruser', function(req, res, next) {
+	var query = Quote.find({ 'authorUser': req.params.authoruser, 'deletionDate': {$exists: false} }).sort('-creationDate');
 
-	query.exec(function (err, quotes){
-		if (err) { 
-			return next(err); 
+	query.exec(function(err, quotes) {
+		if (err) {
+			return next(err);
 		}
-		if (!quotes) { 
-			return next(new Error("can't find Quote")); 
-		}
-		
-		req.quotes = quotes;
-		return next();
-	  });
-});
-router.get('/quotes/byauthoruser/:authoruser', function(req, res) {
-	res.json(req.recette);
+		res.json(quotes);
+	});
 });
 
 module.exports = router;
