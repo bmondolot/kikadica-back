@@ -7,7 +7,7 @@ var Kway = mongoose.model('Kway');
 
 /* GET All Quotes */
 router.get('/quotes', function(req, res, next) {
-	Quote.find(function(err, quotes) {
+	Quote.find({deletionDate: {$exists: false}}).sort('-creationDate').exec(function(err, quotes) {
 		if (err) {
 			return next(err);
 		}
