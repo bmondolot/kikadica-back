@@ -4,8 +4,13 @@ var mongoose = require('mongoose');
 var Quote = mongoose.model('Quote');
 var Kway = mongoose.model('Kway');
 
+const DEFAULT_PAGE = 1;
+const DEFAULT_QUOTES_PER_PAGE = 10;
 
-/* GET All Quotes */
+/*
+ * @Deprecated 
+ * GET All Quotes
+ */
 router.get('/quotes', function(req, res, next) {
 	console.warn("/quotes route is deprecated, please use /quotes/page/:page/perpage/:quotesperpage instead.");
 	
@@ -19,15 +24,16 @@ router.get('/quotes', function(req, res, next) {
 });
 
 router.get('/quotes/page/:page/perpage/:quotesperpage', function(req, res, next) {
+	// TODO need refactoring
 	var page = Number(req.params.page);
 	var quotesperpage = Number(req.params.quotesperpage);
 	
 	// by default we will get first page with 10 quotes
 	if (isNaN(page)) {
-		page = 1;
+		page = DEFAULT_PAGE;
 	}
 	if (isNaN(quotesperpage)) {
-		quotesperpage = 10;
+		quotesperpage = DEFAULT_QUOTES_PER_PAGE;
 	}
 	
 	Quote.find({deletionDate: {$exists: false}}).sort('-creationDate').skip((page - 1) * quotesperpage).limit(quotesperpage).exec(function(err, quotes) {
@@ -79,8 +85,13 @@ router.post('/quote', function (req, res, next) {
 	});
 });
 
-/* Find by quoted user */
+/*
+ * @Deprecated
+ * Find by quoted user
+ */
 router.get('/quotes/byquoteduser/:quoteduser', function(req, res) {
+	console.warn("/quotes/byquoteduser/:quoteduser route is deprecated, please use /quotes/byquoteduser/:quoteduser/page/:page/perpage/:quotesperpage instead.");
+	
 	var query = Quote.find({ 'quotedUser': req.params.quoteduser, 'deletionDate': {$exists: false} }).sort('-creationDate');
 
 	query.exec(function(err, quotes) {
@@ -92,9 +103,62 @@ router.get('/quotes/byquoteduser/:quoteduser', function(req, res) {
 	});
 });
 
-/* Find by author user */
+router.get('/quotes/byquoteduser/:quoteduser/page/:page/perpage/:quotesperpage', function(req, res) {
+	// TODO need refactoring
+	var page = Number(req.params.page);
+	var quotesperpage = Number(req.params.quotesperpage);
+	
+	// by default we will get first page with 10 quotes
+	if (isNaN(page)) {
+		page = DEFAULT_PAGE;
+	}
+	if (isNaN(quotesperpage)) {
+		quotesperpage = DEFAULT_QUOTES_PER_PAGE;
+	}
+	
+	var query = Quote.find({ 'quotedUser': req.params.quoteduser, 'deletionDate': {$exists: false} }).sort('-creationDate').skip((page - 1) * quotesperpage).limit(quotesperpage);
+
+	query.exec(function(err, quotes) {
+		if (err) {
+			console.log("Unable to get quotes by quotedUser " + req.params.quoteduser + " because of " + err);
+			return next(err);
+		}
+		res.json(quotes);
+	});
+});
+
+/*
+ * @Deprecated 
+ * Find by author user
+ */
 router.get('/quotes/byauthoruser/:authoruser', function(req, res, next) {
+	console.warn("/quotes/byauthoruser/:authoruser route is deprecated, please use /quotes/byauthoruser/:authoruser/page/:page/perpage/:quotesperpage instead.");
+	
 	var query = Quote.find({ 'authorUser': req.params.authoruser, 'deletionDate': {$exists: false} }).sort('-creationDate');
+
+	query.exec(function(err, quotes) {
+		if (err) {
+			console.log("Unable to get quotes by authorUser " + req.params.authoruser + " because of " + err);
+			return next(err);
+		}
+		res.json(quotes);
+	});
+});
+
+router.get('/quotes/byauthoruser/:authoruser/page/:page/perpage/:quotesperpage', function(req, res, next) {
+	// TODO need refactoring 
+	var page = Number(req.params.page);
+	var quotesperpage = Number(req.params.quotesperpage);
+	
+	// by default we will get first page with 10 quotes
+	if (isNaN(page)) {
+		page = DEFAULT_PAGE;
+	}
+	if (isNaN(quotesperpage)) {
+		quotesperpage = DEFAULT_QUOTES_PER_PAGE;
+	}
+	
+	var query = Quote.find({ 'authorUser': req.params.authoruser, 'deletionDate': {$exists: false} }).sort('-creationDate').skip((page - 1) * quotesperpage).limit(quotesperpage);
 
 	query.exec(function(err, quotes) {
 		if (err) {
