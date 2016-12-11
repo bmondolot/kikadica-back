@@ -7,7 +7,30 @@ var Kway = mongoose.model('Kway');
 
 /* GET All Quotes */
 router.get('/quotes', function(req, res, next) {
+	console.warn("/quotes route is deprecated, please use /quotes/page/:page/perpage/:quotesperpage instead.");
+	
 	Quote.find({deletionDate: {$exists: false}}).sort('-creationDate').exec(function(err, quotes) {
+		if (err) {
+			console.log("Unable to get quotes because of " + err);
+			return next(err);
+		}
+		res.json(quotes);
+	});
+});
+
+router.get('/quotes/page/:page/perpage/:quotesperpage', function(req, res, next) {
+	var page = Number(req.params.page);
+	var quotesperpage = Number(req.params.quotesperpage);
+	
+	// by default we will get first page with 10 quotes
+	if (isNaN(page)) {
+		page = 1;
+	}
+	if (isNaN(quotesperpage)) {
+		quotesperpage = 10;
+	}
+	
+	Quote.find({deletionDate: {$exists: false}}).sort('-creationDate').skip((page - 1) * quotesperpage).limit(quotesperpage).exec(function(err, quotes) {
 		if (err) {
 			console.log("Unable to get quotes because of " + err);
 			return next(err);
