@@ -10,7 +10,8 @@ mongoose.connect('mongodb://localhost/quotes');
 require('./models/Quote');
 require('./models/Kway');
 
-var routes = require('./routes/index');
+var routesQuotes = require('./routes/quotes');
+var routesKway = require('./routes/kway');
 
 var app = express();
 
@@ -26,7 +27,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+app.use('/', routesQuotes);
+app.use('/', routesKway);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
