@@ -5,6 +5,7 @@ var Quote = mongoose.model('Quote');
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PER_PAGE = 10;
+const DEFAULT_PER_PAGE_TOP3 = 3;
 const PAGE_PARAM = 'page';
 const PERPAGE_PARAM = 'perpage';
 
@@ -164,6 +165,44 @@ router.get('/quotes/deleted', function(req, res, next) {
 			return next(err);
 		}
 		res.json(quotes);
+	});
+});
+
+/*
+ * Get all authors, ordered by their amount of quotes
+ */
+router.get('/authors/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
+	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
+	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE_TOP3);
+	
+	var query = Quote.aggregate( [{ $match: {'deletionDate': {$exists: false}} }, { $group: { _id: '$authorUser', totalQuotes: { $sum: 1} }}] );
+	query.sort('-totalQuotes').skip((page - 1) * perpage).limit(perpage);
+	
+	query.exec(function(err, data) {
+		if (err) {
+			console.log("Unable to get authors (page=" + page + ", perpage=" + perpage + ") because of " + err);
+			return next(err);
+		}
+		res.json(data);
+	});
+});
+
+/*
+ * Get all quoted, ordered by their amount of quotes
+ */
+router.get('/quoted/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
+	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
+	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE_TOP3);
+	
+	var query = Quote.aggregate( [{ $match: {'deletionDate': {$exists: false}} }, { $group: { _id: '$quotedUser', totalQuotes: { $sum: 1} }}] );
+	query.sort('-totalQuotes').skip((page - 1) * perpage).limit(perpage);
+	
+	query.exec(function(err, data) {
+		if (err) {
+			console.log("Unable to get quoted (page=" + page + ", perpage=" + perpage + ") because of " + err);
+			return next(err);
+		}
+		res.json(data);
 	});
 });
 
