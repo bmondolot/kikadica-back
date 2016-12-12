@@ -5,15 +5,19 @@ var Quote = mongoose.model('Quote');
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PER_PAGE = 10;
+const DEFAULT_MAX = 100;
 const PAGE_PARAM = 'page';
 const PERPAGE_PARAM = 'perpage';
 
-function getParamAsInt(req, name, defaultValue) {
+function getParamAsInt(req, name, defaultValue, maxValue = DEFAULT_MAX) {
 	var param = Number(req.params[name]);
 	
 	if (isNaN(param)) {
 		console.warn("This value (" + req.params[name] + ") is not correct for the param \"" + name +"\", set param value to default one (" + defaultValue + ")");
 		param = defaultValue;
+	} else if (param > maxValue) {
+		console.warn("This value (" + req.params[name] + ") is too high for the param \"" + name +"\", set param value to max one (" + maxValue + ")");
+		param = maxValue;
 	}
 	
 	return param;
