@@ -205,4 +205,21 @@ router.get('/quoted/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '
 	});
 });
 
+/*
+ * Get random quote
+ */
+router.get('/quote/random', function(req, res, next) {
+	Quote.count( {'deletionDate': {$exists: false}} ).exec(function(err, count) {
+		var random = Math.floor(Math.random() * count);
+		
+		Quote.findOne( {'deletionDate': {$exists: false}} ).skip(random).exec(function (err, data) {
+			if (err) {
+				console.log("Unable to get random quote because of " + err);
+				return next(err);
+			}
+			res.json(data);
+		});
+	});
+});
+
 module.exports = router;
