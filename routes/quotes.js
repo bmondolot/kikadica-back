@@ -9,8 +9,8 @@ const DEFAULT_MAX = 100;
 const PAGE_PARAM = 'page';
 const PERPAGE_PARAM = 'perpage';
 
-function getParamAsInt(req, name, defaultValue, maxValue = DEFAULT_MAX) {
-	var param = Number(req.params[name]);
+const getParamAsInt = (req, name, defaultValue, maxValue = DEFAULT_MAX) => {
+	let param = Number(req.params[name]);
 	
 	if (isNaN(param)) {
 		console.warn("This value (" + req.params[name] + ") is not correct for the param \"" + name +"\", set param value to default one (" + defaultValue + ")");
@@ -25,8 +25,8 @@ function getParamAsInt(req, name, defaultValue, maxValue = DEFAULT_MAX) {
 
 /* Get All Quotes */
 router.get('/quotes/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
-	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
-	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
+	let page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
+	let perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
 	
 	Quote.find({deletionDate: {$exists: false}}).sort('-creationDate').skip((page - 1) * perpage).limit(perpage).exec(function(err, quotes) {
 		if (err) {
@@ -39,7 +39,7 @@ router.get('/quotes/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '
 
 /* Add a new quote */
 router.put('/quote', function (req, res, next) {
-	var quote = new Quote(req.body);
+	let quote = new Quote(req.body);
 	
 	quote.save(function(err, pos) {
 		if (err) {
@@ -52,7 +52,7 @@ router.put('/quote', function (req, res, next) {
 
 /* Delete a quote */
 router.delete('/quote', function (req, res, next) {
-	var quote = new Quote(req.body);
+	let quote = new Quote(req.body);
 	quote.deletionDate = new Date();	
 	
 	Quote.findByIdAndUpdate(quote._id, quote.toObject(), {'new': true}, function(err, newQuote) {
@@ -66,7 +66,7 @@ router.delete('/quote', function (req, res, next) {
 
 /* Update a quote */
 router.post('/quote', function (req, res, next) {
-	var quote = new Quote(req.body);
+	let quote = new Quote(req.body);
 	
 	Quote.findByIdAndUpdate(quote._id, quote.toObject(), {'new': true}, function(err, newQuote) {
 		if (err) {
@@ -79,10 +79,10 @@ router.post('/quote', function (req, res, next) {
 
 /* Find by quoted user */
 router.get('/quotes/byquoteduser/:quoteduser/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res) {
-	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
-	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
+	let page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
+	let perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
 	
-	var query = Quote.find({ 'quotedUser': req.params.quoteduser, 'deletionDate': {$exists: false} }).sort('-creationDate').skip((page - 1) * perpage).limit(perpage);
+	let query = Quote.find({ 'quotedUser': req.params.quoteduser, 'deletionDate': {$exists: false} }).sort('-creationDate').skip((page - 1) * perpage).limit(perpage);
 
 	query.exec(function(err, quotes) {
 		if (err) {
@@ -95,10 +95,10 @@ router.get('/quotes/byquoteduser/:quoteduser/' + PAGE_PARAM + '/:' + PAGE_PARAM 
 
 /* Find by author user */
 router.get('/quotes/byauthoruser/:authoruser/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
-	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
-	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
+	let page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
+	let perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
 	
-	var query = Quote.find({ 'authorUser': req.params.authoruser, 'deletionDate': {$exists: false} }).sort('-creationDate').skip((page - 1) * perpage).limit(perpage);
+	let query = Quote.find({ 'authorUser': req.params.authoruser, 'deletionDate': {$exists: false} }).sort('-creationDate').skip((page - 1) * perpage).limit(perpage);
 
 	query.exec(function(err, quotes) {
 		if (err) {
@@ -122,10 +122,10 @@ router.get('/quotes/deleted', function(req, res, next) {
 
 /* Get all authors, ordered by their amount of quotes */
 router.get('/authors/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
-	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
-	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
+	let page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
+	let perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
 	
-	var query = Quote.aggregate( [{ $match: {'deletionDate': {$exists: false}} }, { $group: { _id: '$authorUser', totalQuotes: { $sum: 1} }}] );
+	let query = Quote.aggregate( [{ $match: {'deletionDate': {$exists: false}} }, { $group: { _id: '$authorUser', totalQuotes: { $sum: 1} }}] );
 	query.sort('-totalQuotes').skip((page - 1) * perpage).limit(perpage);
 	
 	query.exec(function(err, data) {
@@ -139,10 +139,10 @@ router.get('/authors/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + 
 
 /* Get all quoted, ordered by their amount of quotes */
 router.get('/quoted/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
-	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
-	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
+	let page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
+	let perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
 	
-	var query = Quote.aggregate( [{ $match: {'deletionDate': {$exists: false}} }, { $group: { _id: '$quotedUser', totalQuotes: { $sum: 1} }}] );
+	let query = Quote.aggregate( [{ $match: {'deletionDate': {$exists: false}} }, { $group: { _id: '$quotedUser', totalQuotes: { $sum: 1} }}] );
 	query.sort('-totalQuotes').skip((page - 1) * perpage).limit(perpage);
 	
 	query.exec(function(err, data) {
@@ -156,11 +156,11 @@ router.get('/quoted/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '
 
 /* Get random quote */
 router.get('/quote/random', function(req, res, next) {
-	var lastMonth = new Date();
+	let lastMonth = new Date();
 	lastMonth.setMonth(lastMonth.getMonth() - 1);
 	
 	Quote.count( {'deletionDate': {$exists: false}, 'creationDate': {$lte: lastMonth}} ).exec(function(err, count) {
-		var random = Math.floor(Math.random() * count);
+		let random = Math.floor(Math.random() * count);
 		
 		Quote.findOne( {'deletionDate': {$exists: false}, 'creationDate': {$lte: lastMonth}} ).skip(random).exec(function (err, data) {
 			if (err) {
