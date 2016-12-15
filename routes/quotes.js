@@ -24,21 +24,8 @@ function getParamAsInt(req, name, defaultValue, maxValue = DEFAULT_MAX) {
 }
 
 /*
- * @Deprecated 
  * GET All Quotes
  */
-router.get('/quotes', function(req, res, next) {
-	console.warn("/quotes route is deprecated, please use /quotes" + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM + " instead.");
-	
-	Quote.find({deletionDate: {$exists: false}}).sort('-creationDate').exec(function(err, quotes) {
-		if (err) {
-			console.log("Unable to get quotes because of " + err);
-			return next(err);
-		}
-		res.json(quotes);
-	});
-});
-
 router.get('/quotes/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
@@ -93,23 +80,8 @@ router.post('/quote', function (req, res, next) {
 });
 
 /*
- * @Deprecated
  * Find by quoted user
  */
-router.get('/quotes/byquoteduser/:quoteduser', function(req, res) {
-	console.warn("/quotes/byquoteduser/:quoteduser route is deprecated, please use /quotes/" + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM + " instead.");
-	
-	var query = Quote.find({ 'quotedUser': req.params.quoteduser, 'deletionDate': {$exists: false} }).sort('-creationDate');
-
-	query.exec(function(err, quotes) {
-		if (err) {
-			console.log("Unable to get quotes by quotedUser " + req.params.quoteduser + " because of " + err);
-			return next(err);
-		}
-		res.json(quotes);
-	});
-});
-
 router.get('/quotes/byquoteduser/:quoteduser/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
@@ -126,23 +98,8 @@ router.get('/quotes/byquoteduser/:quoteduser/' + PAGE_PARAM + '/:' + PAGE_PARAM 
 });
 
 /*
- * @Deprecated 
  * Find by author user
  */
-router.get('/quotes/byauthoruser/:authoruser', function(req, res, next) {
-	console.warn("/quotes/byauthoruser/:authoruser route is deprecated, please use /quotes/" + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM+ " instead.");
-	
-	var query = Quote.find({ 'authorUser': req.params.authoruser, 'deletionDate': {$exists: false} }).sort('-creationDate');
-
-	query.exec(function(err, quotes) {
-		if (err) {
-			console.log("Unable to get quotes by authorUser " + req.params.authoruser + " because of " + err);
-			return next(err);
-		}
-		res.json(quotes);
-	});
-});
-
 router.get('/quotes/byauthoruser/:authoruser/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
