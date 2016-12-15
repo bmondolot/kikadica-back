@@ -23,9 +23,7 @@ function getParamAsInt(req, name, defaultValue, maxValue = DEFAULT_MAX) {
 	return param;
 }
 
-/*
- * GET All Quotes
- */
+/* Get All Quotes */
 router.get('/quotes/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
@@ -79,9 +77,7 @@ router.post('/quote', function (req, res, next) {
 	});
 });
 
-/*
- * Find by quoted user
- */
+/* Find by quoted user */
 router.get('/quotes/byquoteduser/:quoteduser/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
@@ -97,9 +93,7 @@ router.get('/quotes/byquoteduser/:quoteduser/' + PAGE_PARAM + '/:' + PAGE_PARAM 
 	});
 });
 
-/*
- * Find by author user
- */
+/* Find by author user */
 router.get('/quotes/byauthoruser/:authoruser/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
@@ -115,9 +109,7 @@ router.get('/quotes/byauthoruser/:authoruser/' + PAGE_PARAM + '/:' + PAGE_PARAM 
 	});
 });
 
-/*
- * Show soft deleted quotes
- */
+/* Show soft deleted quotes */
 router.get('/quotes/deleted', function(req, res, next) {
 	Quote.find({deletionDate: {$exists: true}}).sort('-deletionDate').exec(function(err, quotes) {
 		if (err) {
@@ -128,9 +120,7 @@ router.get('/quotes/deleted', function(req, res, next) {
 	});
 });
 
-/*
- * Get all authors, ordered by their amount of quotes
- */
+/* Get all authors, ordered by their amount of quotes */
 router.get('/authors/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
@@ -147,9 +137,7 @@ router.get('/authors/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + 
 	});
 });
 
-/*
- * Get all quoted, ordered by their amount of quotes
- */
+/* Get all quoted, ordered by their amount of quotes */
 router.get('/quoted/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '/:' + PERPAGE_PARAM, function(req, res, next) {
 	var page = getParamAsInt(req, PAGE_PARAM, DEFAULT_PAGE);
 	var perpage = getParamAsInt(req, PERPAGE_PARAM, DEFAULT_PER_PAGE);
@@ -166,14 +154,15 @@ router.get('/quoted/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '
 	});
 });
 
-/*
- * Get random quote
- */
+/* Get random quote */
 router.get('/quote/random', function(req, res, next) {
-	Quote.count( {'deletionDate': {$exists: false}} ).exec(function(err, count) {
+	var lastMonth = new Date();
+	lastMonth.setMonth(lastMonth.getMonth() - 1);
+	
+	Quote.count( {'deletionDate': {$exists: false}, 'creationDate': {$lte: lastMonth}} ).exec(function(err, count) {
 		var random = Math.floor(Math.random() * count);
 		
-		Quote.findOne( {'deletionDate': {$exists: false}} ).skip(random).exec(function (err, data) {
+		Quote.findOne( {'deletionDate': {$exists: false}, 'creationDate': {$lte: lastMonth}} ).skip(random).exec(function (err, data) {
 			if (err) {
 				console.log("Unable to get random quote because of " + err);
 				return next(err);
