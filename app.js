@@ -12,6 +12,7 @@ require('./models/Kway');
 
 var routesQuotes = require('./routes/quotes');
 var routesKway = require('./routes/kway');
+var routesRSS = require('./routes/rss');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routesQuotes);
 app.use('/', routesKway);
+app.use('/rss/', routesRSS);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
