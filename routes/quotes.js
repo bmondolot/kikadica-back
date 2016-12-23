@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
+var moment = require('moment');
 var Quote = mongoose.model('Quote');
 
 const DEFAULT_PAGE = 1;
@@ -40,6 +41,11 @@ router.get('/quotes/' + PAGE_PARAM + '/:' + PAGE_PARAM + '/' + PERPAGE_PARAM + '
 /* Add a new quote */
 router.put('/quote', function (req, res, next) {
 	let quote = new Quote(req.body);
+	
+	if (!quote.creationDate) {
+		// front sends us creationDate under JSON format : {time: "23/12/2016 19:37"}
+		quote.creationDate = new Date(moment(req.body.creationDate.time, 'DD/MM/YYYY hh:mm'));
+	}
 	
 	quote.save(function(err, pos) {
 		if (err) {
